@@ -1,174 +1,136 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Loja Moderna</title>
+  <meta charset="UTF-8">
+  <title>Vapes Premium</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <div class="nav">
-    <div class="logo">LOJA</div>
-    <nav>
-      <a href="#inicio">Início</a>
-      <a href="#produtos">Produtos</a>
-      <a href="javascript:openCart()" class="cart-pill">
-        Carrinho (<span id="cartCount">0</span>)
-      </a>
-    </nav>
+    <img src="logo.png" class="logo">
+<button class="cart-button" onclick="openCart()">
+  🛒
+  <span id="cartCount">0</span>
+</button>
+
   </div>
 </header>
 
-<main id="inicio">
-  <section class="hero">
-    <div>
-      <h1>Design moderno. Compra simples.</h1>
-      <p>Loja inspirada em grandes marcas, pronta para GitHub Pages.</p>
-    </div>
-    <div class="hero-visual"></div>
-  </section>
+<section class="hero">
+  <div class="hero-text">
+    <h1>Vapes Premium</h1>
+    <p>O melhor preço. Compra simples e fornecedor autorizado.</p>
+  </div>
 
-  <section id="produtos" class="section">
-    <h2>Produtos</h2>
-    <div id="grid" class="grid"></div>
-  </section>
-</main>
+  <div class="hero-visual">
+    <img src="retangulo.jpg">
+  </div>
+</section>
 
-<!-- MODAL CARRINHO -->
-<div id="overlay" class="overlay" onclick="closeCart()">
+<section class="section">
+  <h2>Produtos</h2>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- CARRINHO -->
+<div class="overlay" id="overlay" onclick="closeCart(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <h3>Seu carrinho</h3>
+    <h3>Carrinho</h3>
     <div id="cartList"></div>
     <div class="total">
       <span>Subtotal</span>
       <span id="cartSubtotal">R$ 0,00</span>
     </div>
-    <div class="footer">
-      <button class="btn-cart" onclick="closeCart()">Continuar comprando</button>
-      <button class="btn-buy" onclick="openCheckout()">Ir para checkout</button>
-    </div>
+    <button class="btn-buy" onclick="openCheckout()">Finalizar</button>
   </div>
 </div>
 
-<!-- MODAL CHECKOUT -->
-<div id="checkoutOverlay" class="overlay" onclick="closeCheckout()">
+<!-- CHECKOUT -->
+<div class="overlay" id="checkoutOverlay" onclick="closeCheckout(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>Checkout</h3>
-
     <input id="cep" placeholder="CEP">
-    <input id="numero" placeholder="Número da residência">
-
+    <input id="numero" placeholder="Número">
     <div class="cart-item">
       <span>Frete</span>
       <strong>R$ 15,00</strong>
     </div>
-
     <div class="total">
       <span>Total</span>
       <span id="checkoutTotal">R$ 0,00</span>
     </div>
-
-    <div class="footer">
-      <button class="btn-cart" onclick="closeCheckout()">Voltar</button>
-      <button class="btn-buy" onclick="pay()">Pagar</button>
-    </div>
+    <button class="btn-buy" onclick="pay()">Pagar</button>
   </div>
 </div>
 
 <script>
-const products = Array.from({ length: 30 }).map((_, i) => ({
-  id: i + 1,
-  name: `Produto ${i + 1}`,
-  price: 149.9 + (i % 5) * 20,
-  img: `https://picsum.photos/seed/p${i+1}/600`
-}));
+const products = [
+  {name:"Elfbar 4000 Kiwi Passion Guava",price:79.9,img:"elfbar 4000 kiwi passion guava.jpg"},
+  {name:"Elfbar 4000 Peach Mango Watermelon",price:79.9,img:"elfbar 4000 peach mango watermelon.jpg"},
+  {name:"Elfbar 4000 Red Mojito",price:79.9,img:"elfbar 4000 red mojito.jpg"},
+  {name:"Elfbar 4000 Sakura Grape",price:79.9,img:"elfbar 4000 sakura grape.jpg"},
+  {name:"Elfbar 4000 Strawberry Kiwi",price:79.9,img:"elfbar 4000 strawberry kiwi.jpg"},
+  {name:"Elfbar 4000 Strawberry Mango",price:79.9,img:"elfbar 4000 strawberry mango.jpg"},
+  {name:"Elfbar 4000 Triple Berry Ice",price:79.9,img:"elfbar 4000 triple berry ice.jpg"},
+  {name:"Elfbar 4000 Watermelon Ice",price:79.9,img:"elfbar 4000 watermelon ice.jpg"},
 
-const grid = document.getElementById('grid');
-const cartCount = document.getElementById('cartCount');
-const cartList = document.getElementById('cartList');
-const cartSubtotal = document.getElementById('cartSubtotal');
-const checkoutTotal = document.getElementById('checkoutTotal');
-const overlay = document.getElementById('overlay');
-const checkoutOverlay = document.getElementById('checkoutOverlay');
+  {name:"Elfbar 10000 Blackberry Cranberry",price:99.9,img:"elfbar 10000 blackberry cranberry.jpg"},
+  {name:"Elfbar 10000 Blueberry",price:99.9,img:"elfbar 10000 blueberry.jpg"},
+  {name:"Elfbar 10000 Coffee",price:99.9,img:"elfbar 10000 coffee.jpg"},
+  {name:"Elfbar 10000 Maçã Verde",price:99.9,img:"elfbar 10000 maçã verde.jpg"},
+  {name:"Elfbar 10000 Manga",price:99.9,img:"elfbar 10000 manga.jpg"},
+  {name:"Elfbar 10000 Melancia",price:99.9,img:"elfbar 10000 melancia.jpg"},
+  {name:"Elfbar 10000 Menta",price:99.9,img:"elfbar 10000 menta.jpg"},
+  {name:"Elfbar 10000 Morango",price:99.9,img:"elfbar 10000 morango.jpg"},
+  {name:"Elfbar 10000 Uva Pêssego",price:99.9,img:"elfbar 10000 uva pessego.jpg"},
 
-let cart = [];
+  {name:"Elfbar Banana",price:89.9,img:"elfbar banana.jpg"},
+  {name:"Elfbar Blueberry e Menta",price:89.9,img:"elfbar blueberry e menta.jpg"},
+  {name:"Elfbar Cereja",price:89.9,img:"elfbar cereja.jpg"},
+  {name:"Elfbar Frutas Tropicais",price:89.9,img:"elfbar frutas tropicais.jpg"},
+  {name:"Elfbar Frutas Vermelhas",price:89.9,img:"elfbar frutas vermelhas.jpg"},
+  {name:"Elfbar Limão Siciliano",price:89.9,img:"elfbar limao siciliano.jpg"},
+  {name:"Elfbar Melancia e Coco",price:89.9,img:"elfbar melancia e coco.jpg"},
+  {name:"Elfbar Melancia",price:89.9,img:"elfbar melancia.jpg"},
+  {name:"Elfbar Morango Pitaya",price:89.9,img:"elfbar morango pitaya.jpg"},
+  {name:"Elfbar Lemon Mint 4000",price:79.9,img:"elfbar4000 lemon mint.jpg"},
+  {name:"Elfbar Miami Mint Power Bank",price:129.9,img:"elfbar miami mint - power bank.jpg"}
+];
 
-function renderProducts() {
-  grid.innerHTML = '';
-  products.forEach(p => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <img src="${p.img}">
-      <h3>${p.name}</h3>
-      <div class="price">R$ ${p.price.toFixed(2)}</div>
-      <div class="actions">
-        <button class="btn-cart" onclick="addToCart(${p.id})">Adicionar</button>
-        <button class="btn-buy" onclick="buyNow(${p.id})">Comprar</button>
-      </div>
-    `;
-    grid.appendChild(card);
-  });
+const grid=document.getElementById("grid");
+const cart=[];
+
+products.forEach((p,i)=>{
+  grid.innerHTML+=`
+  <div class="card">
+    <img src="${p.img}">
+    <h3>${p.name}</h3>
+    <div class="price">R$ ${p.price.toFixed(2)}</div>
+    <div class="actions">
+      <button class="btn-cart" onclick="addToCart(${i})">Adicionar</button>
+      <button class="btn-buy" onclick="buyNow(${i})">Comprar</button>
+    </div>
+  </div>`;
+});
+
+function addToCart(i){cart.push(products[i]);updateCart();}
+function buyNow(i){addToCart(i);openCart();}
+
+function updateCart(){
+  let s=0;cartList.innerHTML="";
+  cart.forEach(p=>{s+=p.price;cartList.innerHTML+=`<div class="cart-item"><span>${p.name}</span><strong>R$ ${p.price.toFixed(2)}</strong></div>`});
+  cartSubtotal.textContent=`R$ ${s.toFixed(2)}`;
+  checkoutTotal.textContent=`R$ ${(s+15).toFixed(2)}`;
 }
 
-function addToCart(id) {
-  cart.push(products.find(p => p.id === id));
-  updateCart();
-}
-
-function buyNow(id) {
-  cart = [products.find(p => p.id === id)];
-  updateCart();
-  openCart();
-}
-
-function updateCart() {
-  cartCount.textContent = cart.length;
-  cartList.innerHTML = '';
-  let subtotal = 0;
-
-  cart.forEach(item => {
-    subtotal += item.price;
-    cartList.innerHTML += `
-      <div class="cart-item">
-        <span>${item.name}</span>
-        <strong>R$ ${item.price.toFixed(2)}</strong>
-      </div>
-    `;
-  });
-
-  cartSubtotal.textContent = `R$ ${subtotal.toFixed(2)}`;
-  checkoutTotal.textContent = `R$ ${(subtotal + 15).toFixed(2)}`;
-}
-
-function openCart() {
-  overlay.style.display = 'flex';
-}
-
-function closeCart() {
-  overlay.style.display = 'none';
-}
-
-function openCheckout() {
-  overlay.style.display = 'none';
-  checkoutOverlay.style.display = 'flex';
-}
-
-function closeCheckout() {
-  checkoutOverlay.style.display = 'none';
-}
-
-function pay() {
-  if (!cep.value || !numero.value) {
-    alert('Preencha CEP e número');
-    return;
-  }
-  alert('Pagamento pronto para integração real!');
-}
-
-renderProducts();
+function openCart(){overlay.style.display="flex";}
+function closeCart(e){if(!e||e.target.id==="overlay")overlay.style.display="none";}
+function openCheckout(){overlay.style.display="none";checkoutOverlay.style.display="flex";}
+function closeCheckout(e){if(!e||e.target.id==="checkoutOverlay")checkoutOverlay.style.display="none";}
+function pay(){if(!cep.value||!numero.value){alert("Preencha endereço");return;}alert("Pagamento iniciado");}
 </script>
 
 </body>
