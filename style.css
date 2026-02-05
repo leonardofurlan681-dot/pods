@@ -1,0 +1,238 @@
+:root {
+  --bg: #07060a;
+  --card: #0f0d16;
+  --text: #f5f3ff;
+  --muted: #a1a1aa;
+  --accent: #8b5cf6;       /* ROXO */
+  --accent-dark: #6d28d9;
+  --accent-glow: rgba(139,92,246,.45);
+  --border: #1f1b2e;
+}
+
+* { box-sizing: border-box }
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: radial-gradient(circle at top, #120f1f, var(--bg));
+  color: var(--text);
+}
+
+/* HEADER */
+header {
+  position: sticky;
+  top: 0;
+  background: rgba(7,6,10,.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+.nav {
+  max-width: 1200px;
+  margin: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--accent);
+}
+
+.nav a {
+  color: var(--text);
+  text-decoration: none;
+  margin-left: 20px;
+  font-weight: 600;
+}
+
+.nav a:hover { color: var(--accent) }
+
+.cart-pill {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+/* HERO */
+.hero {
+  max-width: 1200px;
+  margin: auto;
+  padding: 80px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.hero h1 {
+  font-size: 44px;
+  line-height: 1.1;
+}
+
+.hero p { color: var(--muted) }
+
+.hero-visual {
+  border-radius: 30px;
+  background: linear-gradient(135deg, #2a1f4d, #0a0712);
+  box-shadow: 0 0 80px var(--accent-glow);
+}
+
+/* SEÇÃO */
+.section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.section h2 {
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+/* PRODUTOS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 24px;
+}
+
+.card {
+  background: linear-gradient(180deg, #141022, #0b0913);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: .25s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 25px 50px var(--accent-glow);
+}
+
+.card img {
+  width: 100%;
+  border-radius: 18px;
+  margin-bottom: 12px;
+}
+
+.price {
+  color: var(--accent);
+  font-weight: 900;
+  font-size: 18px;
+}
+
+/* BOTÕES */
+.actions {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+button {
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-cart {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.btn-cart:hover {
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.btn-buy {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+}
+
+.btn-buy:hover {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* MODAIS (CARRINHO + CHECKOUT) */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5,4,10,.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background: linear-gradient(180deg, #151027, #090713);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  padding: 26px;
+  width: min(460px, 92vw);
+  box-shadow: 0 40px 120px rgba(0,0,0,.8);
+  animation: pop .25s ease;
+}
+
+@keyframes pop {
+  from { transform: scale(.92); opacity: 0 }
+  to { transform: scale(1); opacity: 1 }
+}
+
+.modal h3 {
+  text-align: center;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+/* CHECKOUT */
+.modal input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #0b0913;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.modal input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.cart-item, .total {
+  display: flex;
+  justify-content: space-between;
+  margin: 14px 0;
+}
+
+.total {
+  font-size: 18px;
+  font-weight: 900;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+/* MOBILE */
+@media (max-width:700px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 40px 16px;
+  }
+  .hero h1 { font-size: 32px }
+  .actions { grid-template-columns: 1fr }
+}
