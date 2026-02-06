@@ -10,21 +10,19 @@
 
 <header>
   <div class="nav">
-    <img src="log.png" class="logo">
-<button class="cart-button" onclick="openCart()">
-  🛒
-  <span id="cartCount">0</span>
-</button>
+    <img src="logo.jpg" class="logo">
 
+    <button class="cart-btn" onclick="openCart()">
+      🛒 <span id="cartCount">0</span>
+    </button>
   </div>
 </header>
 
 <section class="hero">
   <div class="hero-text">
     <h1>Vapes Premium</h1>
-    <p>O melhor preço. Compra simples e fornecedor autorizado.</p>
+    <p>Produtos originais. Compra simples. Checkout rápido.</p>
   </div>
-
   <div class="hero-visual">
     <img src="retangulo.jpg">
   </div>
@@ -36,16 +34,16 @@
 </section>
 
 <!-- CARRINHO -->
-<div class="overlay" id="overlay" onclick="closeCart(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <h3>Carrinho</h3>
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart(event)">
+  <aside class="cart-drawer" onclick="event.stopPropagation()">
+    <h3>Seu carrinho</h3>
     <div id="cartList"></div>
     <div class="total">
       <span>Subtotal</span>
-      <span id="cartSubtotal">R$ 0,00</span>
+      <strong id="cartSubtotal">R$ 0,00</strong>
     </div>
     <button class="btn-buy" onclick="openCheckout()">Finalizar</button>
-  </div>
+  </aside>
 </div>
 
 <!-- CHECKOUT -->
@@ -53,15 +51,18 @@
   <div class="modal" onclick="event.stopPropagation()">
     <h3>Checkout</h3>
     <input id="cep" placeholder="CEP">
-    <input id="numero" placeholder="Número">
+    <input id="numero" placeholder="Número da residência">
+
     <div class="cart-item">
       <span>Frete</span>
       <strong>R$ 15,00</strong>
     </div>
+
     <div class="total">
       <span>Total</span>
-      <span id="checkoutTotal">R$ 0,00</span>
+      <strong id="checkoutTotal">R$ 0,00</strong>
     </div>
+
     <button class="btn-buy" onclick="pay()">Pagar</button>
   </div>
 </div>
@@ -76,6 +77,7 @@ const products = [
   {name:"Elfbar 4000 Strawberry Mango",price:79.9,img:"elfbar 4000 strawberry mango.jpg"},
   {name:"Elfbar 4000 Triple Berry Ice",price:79.9,img:"elfbar 4000 triple berry ice.jpg"},
   {name:"Elfbar 4000 Watermelon Ice",price:79.9,img:"elfbar 4000 watermelon ice.jpg"},
+  {name:"Elfbar 4000 Lemon Mint",price:79.9,img:"elfbar4000 lemon mint.jpg"},
 
   {name:"Elfbar 10000 Blackberry Cranberry",price:99.9,img:"elfbar 10000 blackberry cranberry.jpg"},
   {name:"Elfbar 10000 Blueberry",price:99.9,img:"elfbar 10000 blueberry.jpg"},
@@ -96,43 +98,61 @@ const products = [
   {name:"Elfbar Melancia e Coco",price:89.9,img:"elfbar melancia e coco.jpg"},
   {name:"Elfbar Melancia",price:89.9,img:"elfbar melancia.jpg"},
   {name:"Elfbar Morango Pitaya",price:89.9,img:"elfbar morango pitaya.jpg"},
-  {name:"Elfbar Lemon Mint 4000",price:79.9,img:"elfbar4000 lemon mint.jpg"},
   {name:"Elfbar Miami Mint Power Bank",price:129.9,img:"elfbar miami mint - power bank.jpg"}
 ];
 
-const grid=document.getElementById("grid");
-const cart=[];
+const grid = document.getElementById("grid");
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 products.forEach((p,i)=>{
-  grid.innerHTML+=`
-  <div class="card">
-    <img src="${p.img}">
-    <h3>${p.name}</h3>
-    <div class="price">R$ ${p.price.toFixed(2)}</div>
-    <div class="actions">
-      <button class="btn-cart" onclick="addToCart(${i})">Adicionar</button>
-      <button class="btn-buy" onclick="buyNow(${i})">Comprar</button>
+  grid.innerHTML += `
+    <div class="card">
+      <img src="${p.img}">
+      <h3>${p.name}</h3>
+      <div class="price">R$ ${p.price.toFixed(2)}</div>
+      <div class="actions">
+        <button class="btn-cart" onclick="addToCart(${i},this)">Adicionar</button>
+        <button class="btn-buy" onclick="buyNow(${i})">Comprar</button>
+      </div>
     </div>
-  </div>`;
+  `;
 });
 
-function addToCart(i){cart.push(products[i]);updateCart();}
-function buyNow(i){addToCart(i);openCart();}
-
-function updateCart(){
-  let s=0;cartList.innerHTML="";
-  cart.forEach(p=>{s+=p.price;cartList.innerHTML+=`<div class="cart-item"><span>${p.name}</span><strong>R$ ${p.price.toFixed(2)}</strong></div>`});
-  cartSubtotal.textContent=`R$ ${s.toFixed(2)}`;
-  checkoutTotal.textContent=`R$ ${(s+15).toFixed(2)}`;
+function addToCart(i,btn){
+  cart.push(products[i]);
+  if(btn){ btn.classList.add("pulse"); setTimeout(()=>btn.classList.remove("pulse"),300); }
+  saveCart();
 }
 
-function openCart(){overlay.style.display="flex";}
-function closeCart(e){if(!e||e.target.id==="overlay")overlay.style.display="none";}
-function openCheckout(){overlay.style.display="none";checkoutOverlay.style.display="flex";}
-function closeCheckout(e){if(!e||e.target.id==="checkoutOverlay")checkoutOverlay.style.display="none";}
-function pay(){if(!cep.value||!numero.value){alert("Preencha endereço");return;}alert("Pagamento iniciado");}
+function buyNow(i){ addToCart(i); openCart(); }
+
+function saveCart(){
+  localStorage.setItem("cart",JSON.stringify(cart));
+  updateCart();
+}
+
+function updateCart(){
+  let total=0;
+  cartList.innerHTML="";
+  cart.forEach(p=>{
+    total+=p.price;
+    cartList.innerHTML+=`<div class="cart-item"><span>${p.name}</span><strong>R$ ${p.price.toFixed(2)}</strong></div>`;
+  });
+  cartSubtotal.textContent=`R$ ${total.toFixed(2)}`;
+  checkoutTotal.textContent=`R$ ${(total+15).toFixed(2)}`;
+  cartCount.textContent=cart.length;
+}
+
+function openCart(){ cartOverlay.classList.add("show"); }
+function closeCart(e){ if(!e || e.target.id==="cartOverlay") cartOverlay.classList.remove("show"); }
+function openCheckout(){ cartOverlay.classList.remove("show"); checkoutOverlay.style.display="flex"; }
+function closeCheckout(e){ if(!e || e.target.id==="checkoutOverlay") checkoutOverlay.style.display="none"; }
+function pay(){ if(!cep.value||!numero.value){alert("Preencha endereço");return;} alert("Pagamento iniciado"); }
+
+updateCart();
 </script>
 
 </body>
 </html>
+
 
