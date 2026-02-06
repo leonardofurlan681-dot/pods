@@ -1,30 +1,34 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Vapes Premium</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Vapes Premium</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <div class="nav">
     <img src="logo.png" class="logo">
-
-    <button class="cart-btn" onclick="openCart()">
-      🛒 <span id="cartCount">0</span>
-    </button>
+    <button class="cart-btn" onclick="openCart()">🛒 <span id="cartCount">0</span></button>
   </div>
 </header>
 
 <section class="hero">
   <div class="hero-text">
     <h1>Vapes Premium</h1>
-    <p>Produtos originais. Compra simples. Checkout rápido.</p>
+    <p>Originais • Premium • Entrega rápida</p>
   </div>
+
   <div class="hero-visual">
     <img src="retangulo.jpg">
+    <div class="puffs-buttons">
+      <button onclick="renderProducts(products)">Todos</button>
+      <button onclick="filterPuffs(4000)">4000 puffs</button>
+      <button onclick="filterPuffs(10000)">10000 puffs</button>
+      <button onclick="filterPuffs(40000)">40000 puffs</button>
+    </div>
   </div>
 </section>
 
@@ -36,7 +40,7 @@
 <!-- CARRINHO -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart(event)">
   <aside class="cart-drawer" onclick="event.stopPropagation()">
-    <h3>Seu carrinho</h3>
+    <h3>Carrinho</h3>
     <div id="cartList"></div>
     <div class="total">
       <span>Subtotal</span>
@@ -50,81 +54,81 @@
 <div class="overlay" id="checkoutOverlay" onclick="closeCheckout(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>Checkout</h3>
-    <input id="cep" placeholder="CEP">
-    <input id="numero" placeholder="Número da residência">
-
-    <div class="cart-item">
-      <span>Frete</span>
-      <strong>R$ 15,00</strong>
-    </div>
-
+    <input placeholder="CEP">
+    <input placeholder="Número">
     <div class="total">
-      <span>Total</span>
+      <span>Total (frete R$15)</span>
       <strong id="checkoutTotal">R$ 0,00</strong>
     </div>
-
     <button class="btn-buy" onclick="pay()">Pagar</button>
   </div>
 </div>
 
 <script>
 const products = [
-  {name:"Elfbar 4000 Kiwi Passion Guava",price:79.9,img:"elfbar 4000 kiwi passion guava.jpg"},
-  {name:"Elfbar 4000 Peach Mango Watermelon",price:79.9,img:"elfbar 4000 peach mango watermelon.jpg"},
-  {name:"Elfbar 4000 Red Mojito",price:79.9,img:"elfbar 4000 red mojito.jpg"},
-  {name:"Elfbar 4000 Sakura Grape",price:79.9,img:"elfbar 4000 sakura grape.jpg"},
-  {name:"Elfbar 4000 Strawberry Kiwi",price:79.9,img:"elfbar 4000 strawberry kiwi.jpg"},
-  {name:"Elfbar 4000 Strawberry Mango",price:79.9,img:"elfbar 4000 strawberry mango.jpg"},
-  {name:"Elfbar 4000 Triple Berry Ice",price:79.9,img:"elfbar 4000 triple berry ice.jpg"},
-  {name:"Elfbar 4000 Watermelon Ice",price:79.9,img:"elfbar 4000 watermelon ice.jpg"},
-  {name:"Elfbar 4000 Lemon Mint",price:79.9,img:"elfbar4000 lemon mint.jpg"},
+  {name:"Elfbar 4000 Kiwi Passion Guava",price:79.9,img:"elfbar 4000 kiwi passion guava.jpg",puffs:4000},
+  {name:"Elfbar 4000 Peach Mango Watermelon",price:79.9,img:"elfbar 4000 peach mango watermelon.jpg",puffs:4000},
+  {name:"Elfbar 4000 Red Mojito",price:79.9,img:"elfbar 4000 red mojito.jpg",puffs:4000},
+  {name:"Elfbar 4000 Sakura Grape",price:79.9,img:"elfbar 4000 sakura grape.jpg",puffs:4000},
+  {name:"Elfbar 4000 Strawberry Kiwi",price:79.9,img:"elfbar 4000 strawberry kiwi.jpg",puffs:4000},
+  {name:"Elfbar 4000 Strawberry Mango",price:79.9,img:"elfbar 4000 strawberry mango.jpg",puffs:4000},
+  {name:"Elfbar 4000 Triple Berry Ice",price:79.9,img:"elfbar 4000 triple berry ice.jpg",puffs:4000},
+  {name:"Elfbar 4000 Watermelon Ice",price:79.9,img:"elfbar 4000 watermelon ice.jpg",puffs:4000},
+  {name:"Elfbar 4000 Lemon Mint",price:79.9,img:"elfbar4000 lemon mint.jpg",puffs:4000},
 
-  {name:"Elfbar 10000 Blackberry Cranberry",price:99.9,img:"elfbar 10000 blackberry cranberry.jpg"},
-  {name:"Elfbar 10000 Blueberry",price:99.9,img:"elfbar 10000 blueberry.jpg"},
-  {name:"Elfbar 10000 Coffee",price:99.9,img:"elfbar 10000 coffee.jpg"},
-  {name:"Elfbar 10000 Maçã Verde",price:99.9,img:"elfbar 10000 maçã verde.jpg"},
-  {name:"Elfbar 10000 Manga",price:99.9,img:"elfbar 10000 manga.jpg"},
-  {name:"Elfbar 10000 Melancia",price:99.9,img:"elfbar 10000 melancia.jpg"},
-  {name:"Elfbar 10000 Menta",price:99.9,img:"elfbar 10000 menta.jpg"},
-  {name:"Elfbar 10000 Morango",price:99.9,img:"elfbar 10000 morango.jpg"},
-  {name:"Elfbar 10000 Uva Pêssego",price:99.9,img:"elfbar 10000 uva pessego.jpg"},
+  {name:"Elfbar 10000 Blackberry Cranberry",price:99.9,img:"elfbar 10000 blackberry cranberry.jpg",puffs:10000},
+  {name:"Elfbar 10000 Blueberry",price:99.9,img:"elfbar 10000 blueberry.jpg",puffs:10000},
+  {name:"Elfbar 10000 Coffee",price:99.9,img:"elfbar 10000 coffee.jpg",puffs:10000},
+  {name:"Elfbar 10000 Maçã Verde",price:99.9,img:"elfbar 10000 maçã verde.jpg",puffs:10000},
+  {name:"Elfbar 10000 Manga",price:99.9,img:"elfbar 10000 manga.jpg",puffs:10000},
+  {name:"Elfbar 10000 Melancia",price:99.9,img:"elfbar 10000 melancia.jpg",puffs:10000},
+  {name:"Elfbar 10000 Menta",price:99.9,img:"elfbar 10000 menta.jpg",puffs:10000},
+  {name:"Elfbar 10000 Morango",price:99.9,img:"elfbar 10000 morango.jpg",puffs:10000},
+  {name:"Elfbar 10000 Pêssego",price:99.9,img:"elfbar 10000 pessego.jpg",puffs:10000},
+  {name:"Elfbar 10000 Uva Pêssego",price:99.9,img:"elfbar 10000 uva pessego.jpg",puffs:10000},
 
-  {name:"Elfbar Banana",price:89.9,img:"elfbar banana.jpg"},
-  {name:"Elfbar Blueberry e Menta",price:89.9,img:"elfbar blueberry e menta.jpg"},
-  {name:"Elfbar Cereja",price:89.9,img:"elfbar cereja.jpg"},
-  {name:"Elfbar Frutas Tropicais",price:89.9,img:"elfbar frutas tropicais.jpg"},
-  {name:"Elfbar Frutas Vermelhas",price:89.9,img:"elfbar frutas vermelhas.jpg"},
-  {name:"Elfbar Limão Siciliano",price:89.9,img:"elfbar limao siciliano.jpg"},
-  {name:"Elfbar Melancia e Coco",price:89.9,img:"elfbar melancia e coco.jpg"},
-  {name:"Elfbar Melancia",price:89.9,img:"elfbar melancia.jpg"},
-  {name:"Elfbar Morango Pitaya",price:89.9,img:"elfbar morango pitaya.jpg"},
-  {name:"Elfbar Miami Mint Power Bank",price:129.9,img:"elfbar miami mint - power bank.jpg"}
+  {name:"Elfbar Banana",price:89.9,img:"elfbar banana.jpg",puffs:10000},
+  {name:"Elfbar Blueberry e Menta",price:89.9,img:"elfbar blueberry e menta.jpg",puffs:10000},
+  {name:"Elfbar Cereja",price:89.9,img:"elfbar cereja.jpg",puffs:10000},
+  {name:"Elfbar Frutas Tropicais",price:89.9,img:"elfbar frutas tropicais.jpg",puffs:10000},
+  {name:"Elfbar Frutas Vermelhas",price:89.9,img:"elfbar frutas vermelhas.jpg",puffs:10000},
+  {name:"Elfbar Limão Siciliano",price:89.9,img:"elfbar limao ciciliano.jpg",puffs:10000},
+  {name:"Elfbar Melancia e Coco",price:89.9,img:"elfbar melancia e coco.jpg",puffs:10000},
+  {name:"Elfbar Melancia",price:89.9,img:"elfbar melancia.jpg",puffs:10000},
+  {name:"Elfbar Morango Pitaya",price:89.9,img:"elfbar morango pitaya.jpg",puffs:10000},
+
+  {name:"Elfbar Miami Mint Power Bank",price:129.9,img:"elfbar miami mint - power bank.jpg",puffs:40000}
 ];
 
-const grid = document.getElementById("grid");
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const grid=document.getElementById("grid");
+const cartList=document.getElementById("cartList");
+const cartCount=document.getElementById("cartCount");
+const cartSubtotal=document.getElementById("cartSubtotal");
+const checkoutTotal=document.getElementById("checkoutTotal");
 
-products.forEach((p,i)=>{
-  grid.innerHTML += `
-    <div class="card">
-      <img src="${p.img}">
-      <h3>${p.name}</h3>
-      <div class="price">R$ ${p.price.toFixed(2)}</div>
-      <div class="actions">
-        <button class="btn-cart" onclick="addToCart(${i},this)">Adicionar</button>
-        <button class="btn-buy" onclick="buyNow(${i})">Comprar</button>
-      </div>
-    </div>
-  `;
-});
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
 
-function addToCart(i,btn){
-  cart.push(products[i]);
-  if(btn){ btn.classList.add("pulse"); setTimeout(()=>btn.classList.remove("pulse"),300); }
-  saveCart();
+function renderProducts(list){
+  grid.innerHTML="";
+  list.forEach((p,i)=>{
+    grid.innerHTML+=`
+      <div class="card">
+        <img src="${p.img}">
+        <h3>${p.name}</h3>
+        <small>${p.puffs} puffs</small>
+        <div class="price">R$ ${p.price.toFixed(2)}</div>
+        <div class="actions">
+          <button class="btn-cart" onclick="addToCart(${i})">Adicionar</button>
+          <button class="btn-buy" onclick="buyNow(${i})">Comprar</button>
+        </div>
+      </div>`;
+  });
 }
 
-function buyNow(i){ addToCart(i); openCart(); }
+function filterPuffs(q){renderProducts(products.filter(p=>p.puffs===q));}
+function addToCart(i){cart.push(products[i]);saveCart();}
+function buyNow(i){addToCart(i);openCart();}
+function removeItem(i){cart.splice(i,1);saveCart();}
 
 function saveCart(){
   localStorage.setItem("cart",JSON.stringify(cart));
@@ -132,28 +136,35 @@ function saveCart(){
 }
 
 function updateCart(){
-  let total=0;
+  let t=0;
   cartList.innerHTML="";
-  cart.forEach(p=>{
-    total+=p.price;
-    cartList.innerHTML+=`<div class="cart-item"><span>${p.name}</span><strong>R$ ${p.price.toFixed(2)}</strong></div>`;
+  cart.forEach((p,i)=>{
+    t+=p.price;
+    cartList.innerHTML+=`
+      <div class="cart-item">
+        <span>${p.name}</span>
+        <div>
+          <strong>R$ ${p.price.toFixed(2)}</strong>
+          <button class="remove" onclick="removeItem(${i})">✕</button>
+        </div>
+      </div>`;
   });
-  cartSubtotal.textContent=`R$ ${total.toFixed(2)}`;
-  checkoutTotal.textContent=`R$ ${(total+15).toFixed(2)}`;
+  cartSubtotal.textContent=`R$ ${t.toFixed(2)}`;
+  checkoutTotal.textContent=`R$ ${(t+15).toFixed(2)}`;
   cartCount.textContent=cart.length;
 }
 
-function openCart(){ cartOverlay.classList.add("show"); }
-function closeCart(e){ if(!e || e.target.id==="cartOverlay") cartOverlay.classList.remove("show"); }
-function openCheckout(){ cartOverlay.classList.remove("show"); checkoutOverlay.style.display="flex"; }
-function closeCheckout(e){ if(!e || e.target.id==="checkoutOverlay") checkoutOverlay.style.display="none"; }
-function pay(){ if(!cep.value||!numero.value){alert("Preencha endereço");return;} alert("Pagamento iniciado"); }
+function openCart(){cartOverlay.classList.add("show");}
+function closeCart(e){if(e.target.id==="cartOverlay")cartOverlay.classList.remove("show");}
+function openCheckout(){cartOverlay.classList.remove("show");checkoutOverlay.style.display="flex";}
+function closeCheckout(e){if(e.target.id==="checkoutOverlay")checkoutOverlay.style.display="none";}
+function pay(){alert("Pagamento iniciado");}
 
+renderProducts(products);
 updateCart();
 </script>
 
 </body>
 </html>
-
 
 
