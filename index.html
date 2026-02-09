@@ -23,11 +23,12 @@
 
   <div class="hero-visual">
     <img src="retangulo.jpg">
+
     <div class="puffs-buttons">
-      <button onclick="renderProducts(products)">Todos</button>
-      <button onclick="filterPuffs(4000)">4000 puffs</button>
-      <button onclick="filterPuffs(10000)">10000 puffs</button>
-      <button onclick="filterPuffs(40000)">40000 puffs</button>
+      <button class="active" onclick="setActive(this);renderProducts(products)">Todos</button>
+      <button onclick="setActive(this);filterPuffs(4000)">4000 puffs</button>
+      <button onclick="setActive(this);filterPuffs(10000)">10000 puffs</button>
+      <button onclick="setActive(this);filterPuffs(15000)">15000 puffs</button>
     </div>
   </div>
 </section>
@@ -42,10 +43,12 @@
   <aside class="cart-drawer" onclick="event.stopPropagation()">
     <h3>Carrinho</h3>
     <div id="cartList"></div>
+
     <div class="total">
       <span>Subtotal</span>
       <strong id="cartSubtotal">R$ 0,00</strong>
     </div>
+
     <button class="btn-buy" onclick="openCheckout()">Finalizar</button>
   </aside>
 </div>
@@ -54,18 +57,52 @@
 <div class="overlay" id="checkoutOverlay" onclick="closeCheckout(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>Checkout</h3>
+
     <input placeholder="CEP">
     <input placeholder="Número">
+
     <div class="total">
       <span>Total (frete R$15)</span>
       <strong id="checkoutTotal">R$ 0,00</strong>
     </div>
-    <button class="btn-buy" onclick="pay()">Pagar</button>
+
+    <button class="btn-buy" onclick="openPix()">Pagar com PIX</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="overlay" id="loginOverlay" onclick="closeLogin(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>Entrar / Cadastrar</h3>
+    <input id="loginName" placeholder="Nome">
+    <input id="loginEmail" placeholder="Email">
+    <input id="loginPass" type="password" placeholder="Senha">
+    <button class="btn-buy" onclick="register()">Cadastrar</button>
+    <button class="btn-cart" onclick="login()">Entrar</button>
+  </div>
+</div>
+
+<!-- PIX -->
+<div class="overlay" id="pixOverlay" onclick="closePix(event)">
+  <div class="modal pix-modal" onclick="event.stopPropagation()">
+    <h3>Pagamento via PIX</h3>
+    <p>Copie o código abaixo:</p>
+
+    <div class="pix-box">
+      <code id="pixCode"></code>
+      <button onclick="copyPix()">Copiar código</button>
+    </div>
+
+    <button class="btn-cart" onclick="closePix()">Fechar</button>
   </div>
 </div>
 
 <script>
-const products = [
+/* ===== PIX ===== */
+const PIX_CODE = "00020126330014BR.GOV.BCB.PIXSUA_CHAVE_AQUI";
+
+/* ===== PRODUTOS ===== */
+const products = [ /* MANTEVE TUDO IGUAL AO SEU */ 
   {name:"Elfbar 4000 Kiwi Passion Guava",price:79.9,img:"elfbar 4000 kiwi passion guava.jpg",puffs:4000},
   {name:"Elfbar 4000 Peach Mango Watermelon",price:79.9,img:"elfbar 4000 peach mango watermelon.jpg",puffs:4000},
   {name:"Elfbar 4000 Red Mojito",price:79.9,img:"elfbar 4000 red mojito.jpg",puffs:4000},
@@ -97,9 +134,14 @@ const products = [
   {name:"Elfbar Melancia",price:89.9,img:"elfbar melancia.jpg",puffs:10000},
   {name:"Elfbar Morango Pitaya",price:89.9,img:"elfbar morango pitaya.jpg",puffs:10000},
 
+  {name:"Elfbar Watermelon Ice",price:119.9,img:"elfbar watermelon ice 15000.jpg",puffs:15000},
+  {name:"Elfbar Sour Apple Ice",price:119.9,img:"elfbar sour apple ice 15000.jpg",puffs:15000},
+  {name:"Elfbar Orange Guava",price:119.9,img:"elfbar orange guava 15000.jpg",puffs:15000},
+
   {name:"Elfbar Miami Mint Power Bank",price:129.9,img:"elfbar miami mint - power bank.jpg",puffs:40000}
 ];
 
+/* ===== SISTEMA ===== */
 const grid=document.getElementById("grid");
 const cartList=document.getElementById("cartList");
 const cartCount=document.getElementById("cartCount");
@@ -107,27 +149,29 @@ const cartSubtotal=document.getElementById("cartSubtotal");
 const checkoutTotal=document.getElementById("checkoutTotal");
 
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let user=JSON.parse(localStorage.getItem("user"))||null;
 
+/* 🔧 CORREÇÃO DO BUG */
 function renderProducts(list){
   grid.innerHTML="";
-  list.forEach((p,i)=>{
+  list.forEach(p=>{
     grid.innerHTML+=`
-      <div class="card">
-        <img src="${p.img}">
-        <h3>${p.name}</h3>
-        <small>${p.puffs} puffs</small>
-        <div class="price">R$ ${p.price.toFixed(2)}</div>
-        <div class="actions">
-          <button class="btn-cart" onclick="addToCart(${i})">Adicionar</button>
-          <button class="btn-buy" onclick="buyNow(${i})">Comprar</button>
-        </div>
-      </div>`;
+    <div class="card">
+      <img src="${p.img}">
+      <h3>${p.name}</h3>
+      <small>${p.puffs} puffs</small>
+      <div class="price">R$ ${p.price.toFixed(2)}</div>
+      <div class="actions">
+        <button class="btn-cart" onclick='addToCart(${JSON.stringify(p)})'>Adicionar</button>
+        <button class="btn-buy" onclick='buyNow(${JSON.stringify(p)})'>Comprar</button>
+      </div>
+    </div>`;
   });
 }
 
 function filterPuffs(q){renderProducts(products.filter(p=>p.puffs===q));}
-function addToCart(i){cart.push(products[i]);saveCart();}
-function buyNow(i){addToCart(i);openCart();}
+function addToCart(p){cart.push(p);saveCart();}
+function buyNow(p){addToCart(p);openCart();}
 function removeItem(i){cart.splice(i,1);saveCart();}
 
 function saveCart(){
@@ -141,24 +185,59 @@ function updateCart(){
   cart.forEach((p,i)=>{
     t+=p.price;
     cartList.innerHTML+=`
-      <div class="cart-item">
-        <span>${p.name}</span>
-        <div>
-          <strong>R$ ${p.price.toFixed(2)}</strong>
-          <button class="remove" onclick="removeItem(${i})">✕</button>
-        </div>
-      </div>`;
+    <div class="cart-item">
+      <span>${p.name}</span>
+      <div>
+        <strong>R$ ${p.price.toFixed(2)}</strong>
+        <button class="remove" onclick="removeItem(${i})">✕</button>
+      </div>
+    </div>`;
   });
   cartSubtotal.textContent=`R$ ${t.toFixed(2)}`;
   checkoutTotal.textContent=`R$ ${(t+15).toFixed(2)}`;
   cartCount.textContent=cart.length;
 }
 
+/* LOGIN */
+function openCheckout(){
+  if(!user){loginOverlay.style.display="flex";return;}
+  cartOverlay.classList.remove("show");
+  checkoutOverlay.style.display="flex";
+}
+function openPix(){
+  if(!user){loginOverlay.style.display="flex";return;}
+  checkoutOverlay.style.display="none";
+  pixOverlay.style.display="flex";
+  pixCode.textContent=PIX_CODE;
+}
+function register(){
+  user={
+    name:loginName.value,
+    email:loginEmail.value,
+    pass:loginPass.value
+  };
+  localStorage.setItem("user",JSON.stringify(user));
+  loginOverlay.style.display="none";
+}
+function login(){
+  const u=JSON.parse(localStorage.getItem("user"));
+  if(u && u.email===loginEmail.value && u.pass===loginPass.value){
+    user=u;
+    loginOverlay.style.display="none";
+  }else alert("Dados inválidos");
+}
+function closeLogin(e){if(e.target.id==="loginOverlay")loginOverlay.style.display="none";}
+
 function openCart(){cartOverlay.classList.add("show");}
 function closeCart(e){if(e.target.id==="cartOverlay")cartOverlay.classList.remove("show");}
-function openCheckout(){cartOverlay.classList.remove("show");checkoutOverlay.style.display="flex";}
 function closeCheckout(e){if(e.target.id==="checkoutOverlay")checkoutOverlay.style.display="none";}
-function pay(){alert("Pagamento iniciado");}
+function closePix(e){if(!e||e.target.id==="pixOverlay")pixOverlay.style.display="none";}
+function copyPix(){navigator.clipboard.writeText(PIX_CODE);alert("Código PIX copiado!");}
+
+function setActive(btn){
+  document.querySelectorAll(".puffs-buttons button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
 
 renderProducts(products);
 updateCart();
@@ -166,5 +245,6 @@ updateCart();
 
 </body>
 </html>
+
 
 
