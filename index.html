@@ -23,6 +23,32 @@
 .badge.orange{background:linear-gradient(135deg,#f97316,#c2410c)}
 .badge.red{background:linear-gradient(135deg,#ef4444,#991b1b)}
 .card{position:relative}
+
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.cart-item button{
+  background:#ef4444;
+  border:none;
+  color:#fff;
+  padding:4px 8px;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+.whats-btn{
+  margin-top:6px;
+  background:#25D366;
+  color:#fff;
+  border:none;
+  padding:6px;
+  border-radius:6px;
+  cursor:pointer;
+  width:100%;
+}
 </style>
 </head>
 
@@ -107,6 +133,7 @@ const products = [
 {name:"Oxbar Blue Razz",price:79.9,img:"oxbar blue razz 10000 puffs.jpg",puffs:10000},
 {name:"Sex Addict Grape Açaí",price:119.9,img:"sex addict grape acai 28000 puffs.jpg",puffs:28000},
 {name:"Nexa Ultra II Strawberry Ice",price:149.9,img:"Nexa ultra II strawberry ice 50000 puffs.jpg",puffs:50000},
+
 {name:"Elfbar 4000 Kiwi Passion Guava",price:59.9,img:"elfbar 4000 kiwi passion guava.jpg",puffs:4000},
 {name:"Elfbar 4000 Peach Mango Watermelon",price:59.9,img:"elfbar 4000 peach mango watermelon.jpg",puffs:4000},
 {name:"Elfbar 4000 Red Mojito",price:59.9,img:"elfbar 4000 red mojito.jpg",puffs:4000},
@@ -116,6 +143,7 @@ const products = [
 {name:"Elfbar 4000 Triple Berry Ice",price:59.9,img:"elfbar 4000 triple berry ice.jpg",puffs:4000},
 {name:"Elfbar 4000 Watermelon Ice",price:59.9,img:"elfbar 4000 watermelon ice.jpg",puffs:4000},
 {name:"Elfbar 4000 Lemon Mint",price:59.9,img:"elfbar4000 lemon mint.jpg",puffs:4000},
+
 {name:"Elfbar 10000 Blackberry Cranberry",price:79.9,img:"elfbar 10000 blackberry cranberry.jpg",puffs:10000},
 {name:"Elfbar 10000 Blueberry",price:79.9,img:"elfbar 10000 blueberry.jpg",puffs:10000},
 {name:"Elfbar 10000 Coffee",price:79.9,img:"elfbar 10000 coffee.jpg",puffs:10000},
@@ -126,9 +154,11 @@ const products = [
 {name:"Elfbar 10000 Morango",price:79.9,img:"elfbar 10000 morango.jpg",puffs:10000},
 {name:"Elfbar 10000 Pêssego",price:79.9,img:"elfbar 10000 pessego.jpg",puffs:10000},
 {name:"Elfbar 10000 Uva Pêssego",price:79.9,img:"elfbar 10000 uva pessego.jpg",puffs:10000},
+
 {name:"Elfbar Watermelon Ice",price:99.9,img:"elfbar watermelon ice 15000.jpg",puffs:15000},
 {name:"Elfbar Sour Apple Ice",price:99.9,img:"elfbar sour apple ice 15000.jpg",puffs:15000},
 {name:"Elfbar Orange Guava",price:99.9,img:"elfbar orange guava 15000.jpg",puffs:15000},
+
 {name:"Elfbar Miami Mint Power Bank",price:109.9,img:"elfbar miami mint - power bank.jpg",puffs:40000}
 ];
 
@@ -149,55 +179,55 @@ grid.innerHTML+=`
 <small>${p.puffs} puffs</small>
 <div class="price">R$ ${p.price.toFixed(2)}</div>
 <button onclick='addToCart(${JSON.stringify(p)})'>Adicionar</button>
+<button class="whats-btn" onclick="productWhatsapp('${p.name}','${p.price.toFixed(2)}')">WhatsApp</button>
 </div>`;
 });
 }
 
 function addToCart(p){cart.push(p);updateCart();}
 
+function removeFromCart(i){
+  cart.splice(i,1);
+  updateCart();
+}
+
 function updateCart(){
 let t=0;
 cartList.innerHTML="";
-cart.forEach(p=>{
+cart.forEach((p,i)=>{
 t+=p.price;
-cartList.innerHTML+=`<div>${p.name} - R$ ${p.price.toFixed(2)}</div>`;
+cartList.innerHTML+=`
+<div class="cart-item">
+<span>${p.name} - R$ ${p.price.toFixed(2)}</span>
+<button onclick="removeFromCart(${i})">X</button>
+</div>`;
 });
 cartSubtotal.textContent=`R$ ${t.toFixed(2)}`;
 checkoutTotal.textContent=`R$ ${(t+15).toFixed(2)}`;
 cartCount.textContent=cart.length;
 }
 
-/* ===== PIX ===== */
 function openPix(){
   pixOverlay.style.display="flex";
   pixCode.textContent = PIX_KEY;
 }
 
 function copyPix(){
-  const text = pixCode.textContent;
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(text).then(()=>{
-      alert("Chave PIX copiada ✅");
-    });
-  }else{
-    const temp=document.createElement("textarea");
-    temp.value=text;
-    document.body.appendChild(temp);
-    temp.select();
-    document.execCommand("copy");
-    document.body.removeChild(temp);
-    alert("Chave PIX copiada ✅");
-  }
+  navigator.clipboard.writeText(pixCode.textContent)
+  .then(()=>alert("Chave PIX copiada ✅"));
 }
 
-/* ===== JÁ PAGUEI → WHATSAPP ===== */
 function confirmPayment(){
-  let msg = "Olá, já realizei o pagamento via PIX.%0A%0A";
+  let msg="Olá, já paguei via PIX.%0A%0A";
   cart.forEach(p=>{
-    msg += `• ${p.name} - R$ ${p.price.toFixed(2)}%0A`;
+    msg+=`• ${p.name} - R$ ${p.price.toFixed(2)}%0A`;
   });
-  msg += `%0ATotal: ${checkoutTotal.textContent}`;
+  msg+=`%0ATotal: ${checkoutTotal.textContent}`;
+  window.open("https://wa.me/5527992435181?text="+msg,"_blank");
+}
 
+function productWhatsapp(name,price){
+  const msg=`Olá, tenho interesse no produto:%0A${name}%0AValor: R$ ${price}`;
   window.open("https://wa.me/5527992435181?text="+msg,"_blank");
 }
 
