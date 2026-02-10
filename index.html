@@ -57,7 +57,6 @@
   <div class="grid" id="grid"></div>
 </section>
 
-<!-- CARRINHO -->
 <div class="cart-overlay" id="cartOverlay" onclick="closeCart(event)">
   <aside class="cart-drawer" onclick="event.stopPropagation()">
     <h3>Carrinho</h3>
@@ -70,7 +69,6 @@
   </aside>
 </div>
 
-<!-- CHECKOUT -->
 <div class="overlay" id="checkoutOverlay" onclick="closeCheckout(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>Checkout</h3>
@@ -84,7 +82,6 @@
   </div>
 </div>
 
-<!-- LOGIN -->
 <div class="overlay" id="loginOverlay" onclick="closeLogin(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <h3>Entrar / Cadastrar</h3>
@@ -96,7 +93,6 @@
   </div>
 </div>
 
-<!-- PIX -->
 <div class="overlay" id="pixOverlay" onclick="closePix(event)">
   <div class="modal pix-modal" onclick="event.stopPropagation()">
     <h3>Pagamento via PIX</h3>
@@ -108,12 +104,11 @@
   </div>
 </div>
 
-<!-- SUCESSO -->
 <div class="overlay" id="successOverlay">
   <div class="modal">
-    <h3>Pedido confirmado 🎉</h3>
+    <h3>Seu pedido foi confirmado 🎉</h3>
     <p id="successText"></p>
-    <p><strong>Entrega estimada:</strong> 3h e 21min</p>
+    <p><strong>Entrega estimada:</strong> 4h e 21min</p>
     <button class="btn-buy" onclick="closeSuccess()">Fechar</button>
   </div>
 </div>
@@ -122,6 +117,19 @@
 const PIX_KEY="c596078a-b918-4feb-87e1-d9cadff1b951";
 
 const products=[
+
+/* ===== PRODUTOS DA IMAGEM (ADICIONADOS) ===== */
+{name:"Chilly Beats Replay",price:149.9,img:"chillybeats replay 36000 puffs.jpg",puffs:36000},
+{name:"Elfbar Pineapple Lime",price:99.9,img:"elfbar pineapple lime.jpg",puffs:10000},
+{name:"Elfbar Sour Lush",price:139.9,img:"elfbar sour lush 30k.jpg",puffs:30000},
+{name:"Geek Bar Orange Dragon",price:119.9,img:"geek bar orange dragon 15000 puffs.jpg",puffs:15000},
+{name:"Hotbox Luxe",price:109.9,img:"hotbox luxe 12000 puffs.jpg",puffs:12000},
+{name:"Ignite Berry Blast",price:119.9,img:"ignite berry blast 15000.jpg",puffs:15000},
+{name:"Oxbar Blue Razz",price:99.9,img:"oxbar blue razz 10000 puffs.jpg",puffs:10000},
+{name:"Sex Addict Grape Açaí",price:139.9,img:"sex addict grape acai 28000 puffs.jpg",puffs:28000},
+{name:"Nexa Ultra II Strawberry Ice",price:169.9,img:"nexa ultra ii strawberry ice 50000 puffs.jpg",puffs:50000},
+
+/* ===== PRODUTOS ORIGINAIS (SEM REMOVER NADA) ===== */
 {name:"Elfbar 4000 Kiwi Passion Guava",price:79.9,img:"elfbar 4000 kiwi passion guava.jpg",puffs:4000},
 {name:"Elfbar 4000 Peach Mango Watermelon",price:79.9,img:"elfbar 4000 peach mango watermelon.jpg",puffs:4000},
 {name:"Elfbar 4000 Red Mojito",price:79.9,img:"elfbar 4000 red mojito.jpg",puffs:4000},
@@ -151,6 +159,11 @@ const products=[
 ];
 
 const grid=document.getElementById("grid");
+const cartList=document.getElementById("cartList");
+const cartSubtotal=document.getElementById("cartSubtotal");
+const checkoutTotal=document.getElementById("checkoutTotal");
+const cartCount=document.getElementById("cartCount");
+
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
 let user=JSON.parse(localStorage.getItem("user"))||null;
 
@@ -176,7 +189,8 @@ ${getBadge(p)}
 <button class="btn-cart" onclick='addToCart(${JSON.stringify(p)})'>Adicionar</button>
 <button class="btn-buy" onclick='buyNow(${JSON.stringify(p)})'>Comprar</button>
 </div>
-</div>`});
+</div>`;
+});
 }
 
 function filterPuffs(q){renderProducts(products.filter(p=>p.puffs===q))}
@@ -191,30 +205,32 @@ updateCart();
 function updateCart(){
 let t=0;
 cartList.innerHTML="";
-cart.forEach((p,i)=>{
+cart.forEach(p=>{
 t+=p.price;
-cartList.innerHTML+=`
-<div class="cart-item">
-<span>${p.name}</span>
-<strong>R$ ${p.price.toFixed(2)}</strong>
-</div>`});
+cartList.innerHTML+=`<div class="cart-item"><span>${p.name}</span><strong>R$ ${p.price.toFixed(2)}</strong></div>`;
+});
 cartSubtotal.textContent=`R$ ${t.toFixed(2)}`;
 checkoutTotal.textContent=`R$ ${(t+15).toFixed(2)}`;
 cartCount.textContent=cart.length;
 }
 
-function gerarPix(v){return`PIX|${PIX_KEY}|${v.toFixed(2)}`}
+function gerarPix(v){return`PIX|${PIX_KEY}${v.toFixed(2)}`}
 
 function openPix(){
-if(!user){loginOverlay.style.display="flex";return;}
 pixOverlay.style.display="flex";
 pixCode.textContent=gerarPix(parseFloat(checkoutTotal.textContent.replace("R$","")));
+}
+
+/* ===== FUNÇÃO CORRIGIDA DO BOTÃO COPIAR ===== */
+function copyPix(){
+navigator.clipboard.writeText(pixCode.textContent).then(()=>{
+alert("Código PIX copiado com sucesso ✅");
+});
 }
 
 function confirmPayment(){
 pixOverlay.style.display="none";
 successOverlay.style.display="flex";
-successText.textContent=`Obrigado, ${user.name}! Seu pedido chegará em breve.`;
 cart=[];saveCart();
 }
 
@@ -226,22 +242,19 @@ loginOverlay.style.display="none";
 
 function login(){
 const u=JSON.parse(localStorage.getItem("user"));
-if(u&&u.email===loginEmail.value&&u.pass===loginPass.value){user=u;loginOverlay.style.display="none";}
-else alert("Dados inválidos");
+if(u&&u.email===loginEmail.value&&u.pass===loginPass.value){
+user=u;loginOverlay.style.display="none";
+}
 }
 
 function openCart(){cartOverlay.classList.add("show")}
 function closeCart(e){if(e.target.id==="cartOverlay")cartOverlay.classList.remove("show")}
-function openCheckout(){if(!user){loginOverlay.style.display="flex";return;}checkoutOverlay.style.display="flex"}
+function openCheckout(){checkoutOverlay.style.display="flex"}
 function closeCheckout(e){if(e.target.id==="checkoutOverlay")checkoutOverlay.style.display="none"}
-function closePix(e){if(!e||e.target.id==="pixOverlay")pixOverlay.style.display="none"}
+function closePix(e){if(e.target.id==="pixOverlay")pixOverlay.style.display="none"}
 function closeLogin(e){if(e.target.id==="loginOverlay")loginOverlay.style.display="none"}
 function closeSuccess(){successOverlay.style.display="none"}
-
-function setActive(btn){
-document.querySelectorAll(".puffs-buttons button").forEach(b=>b.classList.remove("active"));
-btn.classList.add("active");
-}
+function setActive(btn){document.querySelectorAll(".puffs-buttons button").forEach(b=>b.classList.remove("active"));btn.classList.add("active")}
 
 renderProducts(products);
 updateCart();
@@ -249,5 +262,4 @@ updateCart();
 
 </body>
 </html>
-
 
