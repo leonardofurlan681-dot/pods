@@ -95,8 +95,8 @@
 
 <script>
 const PIX_KEY = "5440793d-cd76-4494-bab9-d85843964714";
-const WHATSAPP = "5527992435181";
 
+/* ===== PRODUTOS (TODOS MANTIDOS) ===== */
 const products = [
 {name:"Chilly Beats Replay",price:129.9,img:"chillybeats replay 36000 puffs.jpg",puffs:36000},
 {name:"Elfbar Pineapple Lime",price:79.9,img:"elfbar pineapple lime.jpg",puffs:10000},
@@ -141,7 +141,6 @@ const cartList=document.getElementById("cartList");
 const cartSubtotal=document.getElementById("cartSubtotal");
 const checkoutTotal=document.getElementById("checkoutTotal");
 const cartCount=document.getElementById("cartCount");
-
 let cart=[];
 
 function renderProducts(list){
@@ -158,10 +157,7 @@ grid.innerHTML+=`
 });
 }
 
-function addToCart(p){
-cart.push(p);
-updateCart();
-}
+function addToCart(p){cart.push(p);updateCart();}
 
 function updateCart(){
 let t=0;
@@ -175,28 +171,27 @@ checkoutTotal.textContent=`R$ ${(t+15).toFixed(2)}`;
 cartCount.textContent=cart.length;
 }
 
-function gerarPix(valor){
-return `00020126360014BR.GOV.BCB.PIX0114${PIX_KEY}520400005303986540${valor.toFixed(2)}5802BR5920Vapes Premium6009Sao Paulo62070503***6304`;
-}
-
+/* ===== PIX: MOSTRA E COPIA SOMENTE A CHAVE ===== */
 function openPix(){
-pixOverlay.style.display="flex";
-pixCode.textContent=gerarPix(parseFloat(checkoutTotal.textContent.replace("R$","")));
+  pixOverlay.style.display="flex";
+  pixCode.textContent = PIX_KEY;
 }
 
 function copyPix(){
-navigator.clipboard.writeText(pixCode.textContent);
-alert("Código PIX copiado ✅");
-}
-
-function confirmPayment(){
-let msg="🛒 *NOVO PEDIDO*%0A%0A";
-cart.forEach(p=>{
-msg+=`• ${p.name} - R$ ${p.price.toFixed(2)}%0A`;
-});
-msg+=`%0A💰 *Total:* ${checkoutTotal.textContent}%0A💳 Pagamento via PIX`;
-
-window.open(`https://wa.me/${WHATSAPP}?text=${msg}`,"_blank");
+  const text = pixCode.textContent;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>{
+      alert("Chave PIX copiada ✅");
+    });
+  }else{
+    const temp=document.createElement("textarea");
+    temp.value=text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    alert("Chave PIX copiada ✅");
+  }
 }
 
 function openCart(){cartOverlay.classList.add("show")}
