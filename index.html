@@ -100,8 +100,10 @@
     <h3>Checkout</h3>
     <input placeholder="CEP">
     <input placeholder="Número">
+    <!-- CAMPO ADICIONADO -->
+    <input placeholder="Rua">
     <div class="total">
-      <span>Total (frete R$15)</span>
+      <span id="freteText">Total (frete)</span>
       <strong id="checkoutTotal">R$ 0,00</strong>
     </div>
     <button class="btn-buy" onclick="openPix()">Pagar com PIX</button>
@@ -122,12 +124,14 @@
 <script>
 const PIX_KEY = "5440793d-cd76-4494-bab9-d85843964714";
 
-/* ===== PRODUTOS (TODOS MANTIDOS) ===== */
+/* ===== FRETE ALEATÓRIO (ADICIONADO) ===== */
+let FRETE = Math.floor(Math.random() * (27 - 15 + 1)) + 15;
+
 const products = [
 {name:"Chilly Beats Replay",price:129.9,img:"chillybeats replay 36000 puffs.jpg",puffs:36000},
-{name:"Elfbar Pineapple Lime",price:79.9,img:"elfbar pineapple lime.jpg",puffs:10000},
+{name:"Elfbar Pineapple Lime",price:129.9,img:"elfbar pineapple lime.jpg",puffs:10000},
 {name:"Elfbar Sour Lush",price:119.9,img:"elfbar sour lush 30k.jpg",puffs:30000},
-{name:"Geek Bar Orange Dragon",price:99.9,img:"geek bar orange dragon 15000 puffs.jpg",puffs:15000},
+{name:"Geek Bar Orange Dragon",price:139.9,img:"geek bar orange dragon 15000 puffs.jpg",puffs:15000},
 {name:"Hotbox Luxe",price:89.9,img:"hotbox luxe 12000 puffs.jpg",puffs:12000},
 {name:"Ignite Berry Blast",price:99.9,img:"ignite berry blast 15000.jpg",puffs:15000},
 {name:"Oxbar Blue Razz",price:79.9,img:"oxbar blue razz 10000 puffs.jpg",puffs:10000},
@@ -167,6 +171,8 @@ const cartList=document.getElementById("cartList");
 const cartSubtotal=document.getElementById("cartSubtotal");
 const checkoutTotal=document.getElementById("checkoutTotal");
 const cartCount=document.getElementById("cartCount");
+const freteText=document.getElementById("freteText");
+
 let cart=[];
 
 function renderProducts(list){
@@ -203,7 +209,8 @@ cartList.innerHTML+=`
 </div>`;
 });
 cartSubtotal.textContent=`R$ ${t.toFixed(2)}`;
-checkoutTotal.textContent=`R$ ${(t+15).toFixed(2)}`;
+checkoutTotal.textContent=`R$ ${(t+FRETE).toFixed(2)}`;
+freteText.textContent=`Total (frete R$ ${FRETE.toFixed(2)})`;
 cartCount.textContent=cart.length;
 }
 
@@ -240,6 +247,7 @@ function setActive(btn){document.querySelectorAll(".puffs-buttons button").forEa
 function filterPuffs(q){renderProducts(products.filter(p=>p.puffs===q))}
 
 renderProducts(products);
+updateCart();
 </script>
 
 </body>
